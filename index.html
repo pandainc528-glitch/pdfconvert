@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Convert</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <h1><span class="brand-strong">PDF</span> Convert</h1>
+  </header>
+
+  <main class="wrap">
+
+    <ol class="steps">
+
+      <li class="step" data-step="1">
+        <div class="step-index">1</div>
+        <div class="step-body">
+          <label for="formatoOrigen">Elija formato de origen</label>
+          <select id="formatoOrigen">
+            <option value="" disabled selected>Seleccione un formato</option>
+            <option value="pdf">PDF</option>
+            <option value="docx">DOCX</option>
+            <option value="doc">DOC</option>
+            <option value="xlsx">XLSX</option>
+            <option value="pptx">PPTX</option>
+            <option value="txt">TXT</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+          </select>
+        </div>
+      </li>
+
+      <li class="step" data-step="2">
+        <div class="step-index">2</div>
+        <div class="step-body">
+          <label>Suba su archivo</label>
+
+          <div id="dropzone" class="dropzone">
+            <input type="file" id="archivoInput" hidden>
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="dz-text">Arrastre su archivo aquí o <span class="dz-link">búsquelo</span></p>
+            <p class="dz-filename" id="nombreArchivo"></p>
+          </div>
+        </div>
+      </li>
+
+      <li class="step" data-step="3">
+        <div class="step-index">3</div>
+        <div class="step-body">
+          <label for="formatoSalida">Elija formato de salida</label>
+          <select id="formatoSalida">
+            <option value="" disabled selected>Seleccione un formato</option>
+            <option value="pdf">PDF</option>
+            <option value="docx">DOCX</option>
+            <option value="xlsx">XLSX</option>
+            <option value="pptx">PPTX</option>
+            <option value="txt">TXT</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+          </select>
+        </div>
+      </li>
+
+    </ol>
+
+    <button id="btnConvertir" class="btn-convertir" disabled>Convertir archivo</button>
+
+    <div id="resultado" class="resultado"></div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
