@@ -3,79 +3,283 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Convert</title>
-<link rel="stylesheet" href="style.css">
+<title>PDFconvert — Convierte tus archivos PDF</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:        #202521;
+    --paper:      #F6F2E9;
+    --paper-dim:  #EDE7D8;
+    --line:       #D9D1BC;
+    --brand-red:  #B23A2E;
+
+    /* un color de identidad por formato de destino */
+    --c-word:     #2E5AAC;
+    --c-excel:    #1E7A46;
+    --c-ppt:      #C1631E;
+    --c-html:     #6E4BAE;
+    --c-image:    #1E7A83;
+    --c-split:    #8A5A2B;
+    --c-merge:    #4A6B2A;
+    --c-zip:      #7A2E4A;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ---------- Encabezado ---------- */
+  header{
+    background: var(--brand-red);
+    padding: 48px 40px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* textura sutil de "hojas apiladas" detrás del titulo, referencia al producto */
+  header::before{
+    content:"";
+    position:absolute;
+    right:-60px; top:-60px;
+    width:260px; height:260px;
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    transform: rotate(12deg);
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-20px; top:20px;
+    width:200px; height:200px;
+    border: 2px solid rgba(255,255,255,0.10);
+    border-radius: 6px;
+    transform: rotate(-6deg);
+  }
+
+  .brand{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4vw, 2.8rem);
+    color: #FBF6EC;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-sub{
+    margin: 10px 0 0;
+    color: rgba(251,246,236,0.82);
+    font-size: 1rem;
+    max-width: 40ch;
+  }
+
+  /* ---------- Cuadrícula de herramientas ---------- */
+  main{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 56px 32px 80px;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+  }
+
+  @media (max-width: 900px){
+    .grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  .tool{
+    --accent: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    aspect-ratio: 1 / 1;
+    background: #FFFDF8;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px;
+    text-decoration: none;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .tool:hover, .tool:focus-visible{
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 20px -12px rgba(32,37,33,0.35);
+  }
+
+  .tool:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .tool svg{ width: 52px; height: 52px; }
+
+  .tool span{
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  footer{
+    text-align: center;
+    padding: 28px 20px 40px;
+    color: #8A8372;
+    font-size: 0.85rem;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .tool{ transition: none; }
+  }
+</style>
 </head>
 <body>
 
-  <header class="topbar">
-    <h1><span class="brand-strong">PDF</span> Convert</h1>
-  </header>
+<header>
+  <h1 class="brand">PDFconvert</h1>
+  <p class="brand-sub">Convierte, une, divide y comprime tus archivos PDF en pocos segundos.</p>
+</header>
 
-  <main class="wrap">
+<main>
+  <div class="grid">
 
-    <ol class="steps">
+    <!--
+      ══════════════════════════════════════════════════════════════
+      CADA <a> ES UN BOTÓN. Reemplaza el href="#" por el archivo real,
+      por ejemplo: href="pdf-a-word.html"
+      ══════════════════════════════════════════════════════════════
+    -->
 
-      <li class="step" data-step="1">
-        <div class="step-index">1</div>
-        <div class="step-body">
-          <label for="formatoOrigen">Elija formato de origen</label>
-          <select id="formatoOrigen">
-            <option value="" disabled selected>Seleccione un formato</option>
-            <option value="pdf">PDF</option>
-            <option value="docx">DOCX</option>
-            <option value="doc">DOC</option>
-            <option value="xlsx">XLSX</option>
-            <option value="pptx">PPTX</option>
-            <option value="txt">TXT</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-          </select>
-        </div>
-      </li>
+    <!-- 1. De PDF a Word -->
+    <a class="tool" style="--accent: var(--c-word)" href="#" data-target="pdf-a-word.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M14 6h26l10 10v42a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-word)" stroke-width="2.5"/>
+        <path d="M40 6v8a2 2 0 0 0 2 2h8" fill="none" stroke="var(--c-word)" stroke-width="2.5"/>
+        <text x="32" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="17" fill="var(--c-word)">W</text>
+      </svg>
+      <span>De PDF a Word</span>
+    </a>
 
-      <li class="step" data-step="2">
-        <div class="step-index">2</div>
-        <div class="step-body">
-          <label>Suba su archivo</label>
+    <!-- 2. De PDF a Excel -->
+    <a class="tool" style="--accent: var(--c-excel)" href="#" data-target="pdf-a-excel.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M14 6h26l10 10v42a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-excel)" stroke-width="2.5"/>
+        <path d="M40 6v8a2 2 0 0 0 2 2h8" fill="none" stroke="var(--c-excel)" stroke-width="2.5"/>
+        <text x="32" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="17" fill="var(--c-excel)">X</text>
+      </svg>
+      <span>De PDF a Excel</span>
+    </a>
 
-          <div id="dropzone" class="dropzone">
-            <input type="file" id="archivoInput" hidden>
-            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <p class="dz-text">Arrastre su archivo aquí o <span class="dz-link">búsquelo</span></p>
-            <p class="dz-filename" id="nombreArchivo"></p>
-          </div>
-        </div>
-      </li>
+    <!-- 3. De PDF a PowerPoint -->
+    <a class="tool" style="--accent: var(--c-ppt)" href="#" data-target="pdf-a-powerpoint.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M14 6h26l10 10v42a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-ppt)" stroke-width="2.5"/>
+        <path d="M40 6v8a2 2 0 0 0 2 2h8" fill="none" stroke="var(--c-ppt)" stroke-width="2.5"/>
+        <text x="32" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="17" fill="var(--c-ppt)">P</text>
+      </svg>
+      <span>De PDF a PowerPoint</span>
+    </a>
 
-      <li class="step" data-step="3">
-        <div class="step-index">3</div>
-        <div class="step-body">
-          <label for="formatoSalida">Elija formato de salida</label>
-          <select id="formatoSalida">
-            <option value="" disabled selected>Seleccione un formato</option>
-            <option value="pdf">PDF</option>
-            <option value="docx">DOCX</option>
-            <option value="xlsx">XLSX</option>
-            <option value="pptx">PPTX</option>
-            <option value="txt">TXT</option>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-          </select>
-        </div>
-      </li>
+    <!-- 4. De PDF a HTML -->
+    <a class="tool" style="--accent: var(--c-html)" href="#" data-target="pdf-a-html.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M14 6h26l10 10v42a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-html)" stroke-width="2.5"/>
+        <path d="M40 6v8a2 2 0 0 0 2 2h8" fill="none" stroke="var(--c-html)" stroke-width="2.5"/>
+        <text x="32" y="42" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="12" fill="var(--c-html)">&lt;/&gt;</text>
+      </svg>
+      <span>De PDF a HTML</span>
+    </a>
 
-    </ol>
+    <!-- 5. De PDF a Imagen -->
+    <a class="tool" style="--accent: var(--c-image)" href="#" data-target="pdf-a-imagen.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M14 6h26l10 10v42a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-image)" stroke-width="2.5"/>
+        <path d="M40 6v8a2 2 0 0 0 2 2h8" fill="none" stroke="var(--c-image)" stroke-width="2.5"/>
+        <circle cx="25" cy="34" r="3" fill="var(--c-image)"/>
+        <path d="M18 46l9-10 7 7 5-6 7 9" stroke="var(--c-image)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>De PDF a Imagen</span>
+    </a>
 
-    <button id="btnConvertir" class="btn-convertir" disabled>Convertir archivo</button>
+    <!-- 6. Dividir PDF -->
+    <a class="tool" style="--accent: var(--c-split)" href="#" data-target="dividir-pdf.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M8 8h20l6 6v30a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-split)" stroke-width="2.5" transform="translate(-2,-2) rotate(-8 20 28)"/>
+        <path d="M36 14h20a2 2 0 0 1 2 2v30a2 2 0 0 1-2 2H36" fill="#fff" stroke="var(--c-split)" stroke-width="2.5" transform="rotate(8 44 32)"/>
+        <path d="M32 6v46" stroke="var(--c-split)" stroke-width="2.5" stroke-dasharray="4 4"/>
+      </svg>
+      <span>Dividir PDF</span>
+    </a>
 
-    <div id="resultado" class="resultado"></div>
+    <!-- 7. Unir PDF -->
+    <a class="tool" style="--accent: var(--c-merge)" href="#" data-target="unir-pdf.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M10 12h18a2 2 0 0 1 2 2v30a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V14a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-merge)" stroke-width="2.5" transform="translate(-5,0)"/>
+        <path d="M34 12h18a2 2 0 0 1 2 2v30a2 2 0 0 1-2 2H34a2 2 0 0 1-2-2V14a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-merge)" stroke-width="2.5" transform="translate(5,0)"/>
+        <path d="M28 32h8m0 0-3-3m3 3-3 3" stroke="var(--c-merge)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Unir PDF</span>
+    </a>
 
-  </main>
+    <!-- 8. Comprimir PDF -->
+    <a class="tool" style="--accent: var(--c-zip)" href="#" data-target="comprimir-pdf.html">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M14 6h26l10 10v42a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z" fill="#fff" stroke="var(--c-zip)" stroke-width="2.5"/>
+        <path d="M40 6v8a2 2 0 0 0 2 2h8" fill="none" stroke="var(--c-zip)" stroke-width="2.5"/>
+        <path d="M20 30h8m8 0h8M20 38h24" stroke="var(--c-zip)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M24 22l-3 4 3 4M40 22l3 4-3 4" stroke="var(--c-zip)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Comprimir PDF</span>
+    </a>
 
-  <script src="script.js"></script>
+  </div>
+</main>
+
+<footer>PDFconvert · Herramientas para tus documentos</footer>
+
+<script>
+  /*
+    Cada botón tiene un atributo data-target con el nombre de archivo
+    sugerido (puedes cambiarlo). Este script toma ese valor y lo usa
+    como destino real del enlace (href) al hacer clic.
+
+    Para conectar cada botón a su página real:
+      1. Cambia el valor de data-target="archivo.html" en el HTML de arriba, o
+      2. Simplemente reemplaza href="#" por href="archivo-real.html"
+         directamente (más simple, y el script de abajo deja de ser necesario).
+
+    Dejo ambas formas listas: si prefieres manejarlo solo con href,
+    puedes borrar este bloque <script> sin problema.
+  */
+  document.querySelectorAll('.tool[data-target]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      var target = btn.getAttribute('data-target');
+      // Evita navegar a una página que aún no existe (href="#").
+      if (btn.getAttribute('href') === '#') {
+        e.preventDefault();
+        window.location.href = target; // <-- navega al archivo real
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
