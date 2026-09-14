@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDFconvert — De PDF a PowerPoint</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- pdf.js: lee el texto y la posición de cada palabra en la página -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- PptxGenJS: genera presentaciones .pptx editables en el navegador -->
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+<style>
+  :root{
+    --ink:        #202521;
+    --paper:      #F6F2E9;
+    --line:       #D9D1BC;
+    --brand-red:  #B23A2E;
+    --accent:     #1E7A46; /* mismo verde usado para "De PDF a PowerPoint" en la página principal */
+    --accent-dim: #E3F0E7;
+    --muted:      #8A8372;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ---------- Encabezado ---------- */
+  header{
+    background: var(--brand-red);
+    padding: 26px 40px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  /* ═══ Cambia href="#" por la ruta real de tu página principal ═══ */
+  .back{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    background: var(--accent);
+    border-radius: 8px;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: filter 0.15s ease;
+  }
+  .back:hover{ filter: brightness(1.1); }
+  .back svg{ width: 22px; height: 22px; }
+
+  .brand{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3vw, 1.9rem);
+    color: #FBF6EC;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---------- Contenido ---------- */
+  main{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  .step-label{
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0 0 8px 2px;
+  }
+
+  /* ---------- Zona de carga ---------- */
+  .dropzone{
+    border: 1.5px dashed var(--line);
+    border-radius: 10px;
+    background: #FFFDF8;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    padding: 32px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone.drag-over{ border-color: var(--accent); background: var(--accent-dim); }
+  .dropzone.has-error{ border-color: var(--brand-red); }
+  .dropzone svg{ width: 40px; height: 40px; opacity: 0.7; }
+  .dropzone .main-text{ font-size: 1.05rem; font-weight: 500; }
+  .dropzone .sub-text{ font-size: 0.85rem; color: var(--muted); }
+
+  /* ---------- Workspace ---------- */
+  #workspace{ display: none; }
+  #workspace.visible{ display: block; }
+
+  .file-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #FFFDF8;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .file-bar .name{ font-weight: 500; }
+  .file-bar .meta{ color: var(--muted); font-size: 0.9rem; }
+  .file-bar button{
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+  .file-bar button:hover{ border-color: var(--accent); }
+
+  /* ---------- Sensibilidad de columnas ---------- */
+  .levels{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 540px){ .levels{ grid-template-columns: 1fr; } }
+
+  .level-card{
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    background: #FFFDF8;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .level-card.active{ border-color: var(--accent); background: var(--accent-dim); }
+  .level-card .title{ font-weight: 600; font-size: 0.92rem; margin-bottom: 3px; }
+  .level-card .desc{ font-size: 0.78rem; color: var(--muted); line-height: 1.35; }
+
+  .convert-hint{
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+    background: #FFFDF8;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 28px;
+  }
+  .convert-hint strong{ color: var(--ink); }
+
+  /* ---------- Progreso ---------- */
+  .progress-wrap{ display: none; margin-bottom: 24px; }
+  .progress-wrap.visible{ display: block; }
+  .progress-wrap .progress-label{ font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
+  .progress-bar{
+    width: 100%; height: 8px; border-radius: 999px;
+    background: var(--accent-dim); overflow: hidden;
+  }
+  .progress-bar > div{ height: 100%; width: 0%; background: var(--accent); transition: width 0.15s ease; }
+
+  /* ---------- Fila de acción ---------- */
+  .download-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+  }
+  .download-row p{ margin: 0; font-size: 1rem; }
+  .download-row .result-detail{ font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+  .primary-btn{
+    background: var(--brand-red);
+    color: #FBF6EC;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s ease, transform 0.15s ease;
+    white-space: nowrap;
+  }
+  .primary-btn:disabled{ background: #D9D1BC; color: #A79E8A; cursor: not-allowed; }
+  .primary-btn:not(:disabled):hover{ filter: brightness(1.08); transform: translateY(-1px); }
+
+  footer{ text-align: center; padding: 28px 20px 40px; color: var(--muted); font-size: 0.85rem; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="#" data-target="index.html" aria-label="Volver">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M19 12H5M5 12l6-6M5 12l6 6" stroke="#FBF6EC" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+  <h1 class="brand">PDFconvert</h1>
+</header>
+
+<main>
+  <p class="step-label">De PDF a PowerPoint</p>
+
+  <!-- Paso 1: subir archivo -->
+  <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Subir archivo PDF">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M12 4v11m0 0-4-4m4 4 4-4M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="main-text" id="dz-main">Subir archivo</span>
+    <span class="sub-text" id="dz-sub">Arrastra un PDF aquí o haz clic para elegirlo</span>
+  </div>
+  <input type="file" id="file-input" accept="application/pdf,.pdf" hidden>
+
+  <!-- Paso 2: workspace -->
+  <div id="workspace">
+
+    <div class="file-bar">
+      <div>
+        <div class="name" id="file-name">—</div>
+        <div class="meta" id="file-meta">—</div>
+      </div>
+      <button id="change-file-btn" type="button">Cambiar archivo</button>
+    </div>
+
+    <div class="levels" id="levels">
+      <div class="level-card" data-gap="6">
+        <div class="title">Columnas ajustadas</div>
+        <div class="desc">Separa en columnas incluso con poco espacio entre palabras.</div>
+      </div>
+      <div class="level-card active" data-gap="12">
+        <div class="title">Equilibrado</div>
+        <div class="desc">Funciona bien para la mayoría de las tablas.</div>
+      </div>
+      <div class="level-card" data-gap="22">
+        <div class="title">Columnas amplias</div>
+        <div class="desc">Solo separa cuando hay bastante espacio en blanco.</div>
+      </div>
+    </div>
+
+    <p class="convert-hint">
+      <strong>Cómo funciona:</strong> cada página se analiza línea por línea, y las columnas
+      se detectan por los espacios en blanco entre bloques de texto (no por líneas divisorias
+      reales). Funciona mejor con tablas simples; en PDFs sin tablas, cada línea de texto
+      llega como una sola celda. Cada página del PDF se convierte en una diapositiva de PowerPoint; el texto se mantiene como cuadros de texto editables.
+    </p>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label" id="progress-label">Procesando…</div>
+      <div class="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div class="download-row">
+      <div>
+        <p id="result-label">Elige la sensibilidad y convierte el archivo</p>
+        <p class="result-detail" id="result-detail"></p>
+      </div>
+      <button class="primary-btn" id="action-btn">Convertir a PowerPoint</button>
+    </div>
+  </div>
+</main>
+
+<footer>PDFconvert · Herramientas para tus documentos</footer>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  // ==================================================================
+  // Elementos
+  // ==================================================================
+  const levelCards    = document.querySelectorAll('.level-card');
+
+  const dropzone      = document.getElementById('dropzone');
+  const fileInput     = document.getElementById('file-input');
+  const dzMain        = document.getElementById('dz-main');
+  const dzSub         = document.getElementById('dz-sub');
+
+  const workspace     = document.getElementById('workspace');
+  const fileNameEl    = document.getElementById('file-name');
+  const fileMetaEl    = document.getElementById('file-meta');
+  const changeFileBtn = document.getElementById('change-file-btn');
+
+  const progressWrap  = document.getElementById('progress-wrap');
+  const progressLabel = document.getElementById('progress-label');
+  const progressFill  = document.getElementById('progress-fill');
+
+  const resultLabel   = document.getElementById('result-label');
+  const resultDetail  = document.getElementById('result-detail');
+  const actionBtn     = document.getElementById('action-btn');
+
+  let currentGap = 12;
+  let originalArrayBuffer = null;
+  let originalFileName = 'documento';
+  let numPages = 0;
+  let readyDownload = null;
+
+  // ==================================================================
+  // Sensibilidad de columnas
+  // ==================================================================
+  levelCards.forEach(card => {
+    card.addEventListener('click', () => {
+      levelCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      currentGap = parseInt(card.dataset.gap, 10);
+      invalidateResult();
+      resultLabel.textContent = 'Elige la sensibilidad y convierte el archivo';
+      resultDetail.textContent = '';
+      actionBtn.textContent = 'Convertir a PowerPoint';
+    });
+  });
+
+  // ==================================================================
+  // Carga del archivo
+  // ==================================================================
+  function resetDropzoneUI(){ dropzone.classList.remove('has-error'); }
+
+  function setError(message){
+    resetDropzoneUI();
+    dropzone.classList.add('has-error');
+    dzMain.textContent = message;
+    dzSub.textContent = 'Intenta con otro archivo PDF';
+  }
+
+  async function handleFile(file){
+    if (!file) return;
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      setError('Ese archivo no es un PDF');
+      return;
+    }
+
+    resetDropzoneUI();
+    dzMain.textContent = 'Cargando…';
+    dzSub.textContent = file.name;
+
+    try {
+      originalArrayBuffer = await file.arrayBuffer();
+      originalFileName = file.name.replace(/\.pdf$/i, '');
+
+      const pdf = await pdfjsLib.getDocument({ data: originalArrayBuffer.slice(0) }).promise;
+      numPages = pdf.numPages;
+
+      fileNameEl.textContent = file.name;
+      fileMetaEl.textContent = `${numPages} página${numPages > 1 ? 's' : ''}`;
+
+      invalidateResult();
+      progressWrap.classList.remove('visible');
+      resultLabel.textContent = 'Elige la sensibilidad y convierte el archivo';
+      resultDetail.textContent = '';
+      actionBtn.textContent = 'Convertir a PowerPoint';
+      actionBtn.disabled = false;
+
+      workspace.classList.add('visible');
+      dropzone.style.display = 'none';
+
+    } catch (err) {
+      console.error(err);
+      setError('No se pudo leer el PDF');
+    }
+  }
+
+  function invalidateResult(){
+    if (readyDownload){ URL.revokeObjectURL(readyDownload.url); readyDownload = null; }
+  }
+
+  // ==================================================================
+  // Reconstrucción de filas y columnas a partir del texto del PDF
+  // ==================================================================
+  async function extractPageGrid(page, gapThreshold){
+    const viewport = page.getViewport({ scale: 1 });
+    const textContent = await page.getTextContent();
+
+    // 1) Agrupa los items de texto en líneas usando la bandera hasEOL de pdf.js
+    const rows = [];
+    let current = [];
+    textContent.items.forEach(item => {
+      if (!item.str){
+        if (item.hasEOL && current.length){ rows.push(current); current = []; }
+        return;
+      }
+      const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+      current.push({ str: item.str, x: tx[4], width: item.width || 0 });
+      if (item.hasEOL){ rows.push(current); current = []; }
+    });
+    if (current.length) rows.push(current);
+
+    // 2) Dentro de cada línea, corta en "celdas" cuando el espacio en blanco supera el umbral
+    const rowSegments = rows.map(rowItems => {
+      rowItems.sort((a, b) => a.x - b.x);
+      const segments = [];
+      let seg = null;
+      rowItems.forEach(it => {
+        if (!seg){
+          seg = { text: it.str, x: it.x, endX: it.x + it.width };
+        } else if (it.x - seg.endX > gapThreshold){
+          segments.push(seg);
+          seg = { text: it.str, x: it.x, endX: it.x + it.width };
+        } else {
+          seg.text += it.str;
+          seg.endX = it.x + it.width;
+        }
+      });
+      if (seg) segments.push(seg);
+      return segments;
+    });
+
+    // 3) Junta las posiciones de inicio de todas las celdas y las agrupa en "columnas" comunes
+    const rawStarts = [];
+    rowSegments.forEach(segs => segs.forEach(s => rawStarts.push(s.x)));
+    rawStarts.sort((a, b) => a - b);
+    const anchors = [];
+    rawStarts.forEach(x => {
+      if (!anchors.length || x - anchors[anchors.length - 1] > 5) anchors.push(x);
+    });
+
+    function nearestAnchor(x){
+      let bestIdx = 0, bestDist = Infinity;
+      anchors.forEach((a, idx) => {
+        const d = Math.abs(a - x);
+        if (d < bestDist){ bestDist = d; bestIdx = idx; }
+      });
+      return bestIdx;
+    }
+
+    // 4) Arma la grilla final, alineando cada celda a su columna
+    let grid = rowSegments.map(segs => {
+      const rowArr = new Array(anchors.length).fill('');
+      segs.forEach(s => {
+        const idx = nearestAnchor(s.x);
+        const text = s.text.trim();
+        if (text) rowArr[idx] = rowArr[idx] ? rowArr[idx] + ' ' + text : text;
+      });
+      return rowArr;
+    });
+
+    // Quita filas totalmente vacías
+    grid = grid.filter(r => r.some(c => c !== ''));
+
+    // Recorta columnas finales vacías en todas las filas
+    let lastUsedCol = -1;
+    grid.forEach(r => r.forEach((c, idx) => { if (c !== '' && idx > lastUsedCol) lastUsedCol = idx; }));
+    if (lastUsedCol >= 0){
+      grid = grid.map(r => r.slice(0, lastUsedCol + 1));
+    }
+
+    return grid;
+  }
+
+  // ==================================================================
+  // Conversión PDF -> PowerPoint
+  // ==================================================================
+  // Cada elemento de texto del PDF se convierte en un cuadro de texto
+  // independiente. Así el contenido sigue siendo editable en PowerPoint.
+  // Se conservan las coordenadas, tamaño aproximado y estilo de fuente.
+
+  function safeFontName(name){
+    const n = String(name || '').toLowerCase();
+    if (n.includes('times') || n.includes('serif')) return 'Times New Roman';
+    if (n.includes('courier') || n.includes('mono')) return 'Courier New';
+    return 'Arial';
+  }
+
+  function isBold(name){
+    return /bold|black|heavy|demi|semibold/i.test(String(name || ''));
+  }
+
+  function isItalic(name){
+    return /italic|oblique/i.test(String(name || ''));
+  }
+
+  async function extractPageText(page){
+    const viewport = page.getViewport({ scale: 1 });
+    const content = await page.getTextContent();
+    const styles = content.styles || {};
+
+    return content.items
+      .filter(item => item.str && item.str.trim())
+      .map(item => {
+        const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+        const style = styles[item.fontName] || {};
+
+        let fontSize = Math.abs(item.transform?.[0] || 0);
+        if (!fontSize) fontSize = Math.abs(item.transform?.[3] || 0);
+        if (!fontSize) fontSize = 12;
+
+        const h = Math.max(fontSize * 1.25, item.height || fontSize);
+
+        return {
+          text: item.str,
+          x: tx[4],
+          baseline: tx[5],
+          w: Math.max(item.width || 0, fontSize * 0.5),
+          h,
+          fontSize,
+          fontFace: safeFontName(style.fontFamily || item.fontName),
+          bold: isBold(style.fontFamily || item.fontName),
+          italic: isItalic(style.fontFamily || item.fontName)
+        };
+      });
+  }
+
+  function pptPosition(item, pageHeight){
+    // PDF usa origen inferior-izquierdo; PowerPoint usa superior-izquierdo.
+    const y = pageHeight - item.baseline - item.h;
+
+    return {
+      x: Math.max(0, item.x / 72),
+      y: Math.max(0, y / 72),
+      w: Math.max(0.02, item.w / 72),
+      h: Math.max(0.08, item.h / 72)
+    };
+  }
+
+  async function convertToPowerPoint(){
+    const pdf = await pdfjsLib.getDocument({
+      data: originalArrayBuffer.slice(0)
+    }).promise;
+
+    const firstPage = await pdf.getPage(1);
+    const firstViewport = firstPage.getViewport({ scale: 1 });
+
+    const pptx = new PptxGenJS();
+    pptx.author = 'PDFconvert';
+    pptx.company = 'PDFconvert';
+    pptx.subject = 'PDF convertido a PowerPoint';
+    pptx.title = originalFileName;
+    pptx.lang = 'es-ES';
+
+    pptx.defineLayout({
+      name: 'PDF_PAGE',
+      width: firstViewport.width / 72,
+      height: firstViewport.height / 72
+    });
+    pptx.layout = 'PDF_PAGE';
+
+    for (let i = 1; i <= numPages; i++){
+      progressLabel.textContent = `Analizando página ${i} de ${numPages}…`;
+      progressFill.style.width =
+        Math.round(((i - 1) / numPages) * 100) + '%';
+
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 1 });
+      const items = await extractPageText(page);
+      const slide = pptx.addSlide();
+
+      slide.background = { color: 'FFFFFF' };
+
+      for (const item of items){
+        const p = pptPosition(item, viewport.height);
+
+        slide.addText(item.text, {
+          x: p.x,
+          y: p.y,
+          w: p.w,
+          h: p.h,
+          fontFace: item.fontFace,
+          fontSize: Math.max(1, Math.min(item.fontSize, 96)),
+          bold: item.bold,
+          italic: item.italic,
+          color: '000000',
+          margin: 0,
+          breakLine: false,
+          fit: 'shrink',
+          valign: 'mid',
+          paraSpaceAfterPt: 0,
+          lineSpacingMultiple: 1
+        });
+      }
+    }
+
+    progressFill.style.width = '100%';
+
+    return await pptx.write({ outputType: 'blob' });
+  }
+
+  // ==================================================================
+  // Botón de acción
+  // ==================================================================
+  actionBtn.addEventListener('click', async () => {
+    if (readyDownload){
+      const a = document.createElement('a');
+      a.href = readyDownload.url;
+      a.download = readyDownload.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return;
+    }
+
+    actionBtn.disabled = true;
+    progressWrap.classList.add('visible');
+    resultLabel.textContent = 'Convirtiendo…';
+    resultDetail.textContent = '';
+
+    try {
+      const blob = await convertToPowerPoint();
+
+      readyDownload = {
+        url: URL.createObjectURL(blob),
+        filename: `${originalFileName}.pptx`
+      };
+
+      progressWrap.classList.remove('visible');
+      resultLabel.textContent = 'Tu PowerPoint está listo';
+      resultDetail.textContent = `Descarga: ${readyDownload.filename}`;
+      actionBtn.textContent = 'Descargar';
+      actionBtn.disabled = false;
+
+      const a = document.createElement('a');
+      a.href = readyDownload.url;
+      a.download = readyDownload.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+    } catch (err) {
+      console.error(err);
+      progressWrap.classList.remove('visible');
+      resultLabel.textContent = 'Ocurrió un error al convertir el archivo';
+      actionBtn.textContent = 'Convertir a PowerPoint';
+      actionBtn.disabled = false;
+    }
+  });
+
+  // ==================================================================
+  // Carga / cambio de archivo
+  // ==================================================================
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+  fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+  ['dragenter', 'dragover'].forEach(evt =>
+    dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); })
+  );
+  ['dragleave', 'drop'].forEach(evt =>
+    dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('drag-over'); })
+  );
+  dropzone.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]));
+
+  changeFileBtn.addEventListener('click', () => {
+    workspace.classList.remove('visible');
+    dropzone.style.display = 'flex';
+    resetDropzoneUI();
+    dzMain.textContent = 'Subir archivo';
+    dzSub.textContent = 'Arrastra un PDF aquí o haz clic para elegirlo';
+    fileInput.value = '';
+    invalidateResult();
+    originalArrayBuffer = null;
+    numPages = 0;
+  });
+
+  // Botón de volver
+  document.querySelector('.back[data-target]').addEventListener('click', function (e) {
+    if (this.getAttribute('href') === '#') {
+      e.preventDefault();
+      window.location.href = this.getAttribute('data-target');
+    }
+  });
+</script>
+
+</body>
+</html>
