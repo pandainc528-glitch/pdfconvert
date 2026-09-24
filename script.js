@@ -33,7 +33,7 @@ const CATEGORIES = [
 const TEST_VIDEO = {
   title: 'Título del video',
   meta: 'Video de prueba',
-  embedUrl: 'https://mega.nz/embed/KCoQVITb#yc633AS-rRt1rTuIonKJFYOWUdIIcJIMaEE3v1K3RIA'
+  embedUrl: 'https://mega.nz/embed/fDpl0KoB#mE7lgflhkhfiX2pCJr-GdwVVJuCd9USlFcTRckzgFu8'
 };
 
 // Mapa categoría -> lista de videos. Por ahora cada categoría
@@ -69,7 +69,7 @@ VIDEOS_BY_CATEGORY.hot = [
     title: 'Video 3',
     meta: 'Video',
     embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
-  }
+  },
 ];
 
 VIDEOS_BY_CATEGORY.amor = [
@@ -83,11 +83,16 @@ VIDEOS_BY_CATEGORY.amor = [
     meta: 'Video',
     embedUrl: 'https://mega.nz/embed/bCoViAhY#-0Qn7tTHw08HKlMuItztalXKPSbl3VxG9fsYbTrUU3k'
   },
-  {
-    title: 'Video 3',
+    {
+      title: 'Video 3',
+      meta: 'Video',
+      embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
+    },
+    {
+    title: 'Secreto de primos',
     meta: 'Video',
-    embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
-  }
+    embedUrl: 'https://mega.nz/embed/fDpl0KoB#mE7lgflhkhfiX2pCJr-GdwVVJuCd9USlFcTRckzgFu8'
+    }
 
 ];
 VIDEOS_BY_CATEGORY.confesiones = [
