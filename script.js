@@ -54,6 +54,7 @@ VIDEOS_BY_CATEGORY.historias = [
     embedUrl: 'https://mega.nz/embed/WK4wQYqA#w0Xv5BJrErytNRvjvqQBs9tXICcsEudfCdKL7l_AMeM'
   }
 ];
+//---------------------------------------------------------------------------------------
 VIDEOS_BY_CATEGORY.hot = [
   {
     title: 'hice el frutifantastico con mi primo',
@@ -69,9 +70,9 @@ VIDEOS_BY_CATEGORY.hot = [
     title: 'Video 3',
     meta: 'Video',
     embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
-  },
+  }
 ];
-
+//---------------------------------------------------------------------------------------
 VIDEOS_BY_CATEGORY.amor = [
   {
     title: 'Mi novia me fue infiel con su ex',
@@ -79,23 +80,46 @@ VIDEOS_BY_CATEGORY.amor = [
     embedUrl: 'https://mega.nz/embed/3KRzFYib#eHTwBIjZuw8YXgOK_1BVMRdYzB-w7m1NpLAEzDGEuYg'
   },
   {
-    title: 'Les enseñe a mis hijas a dar mamadas',
-    meta: 'Video',
-    embedUrl: 'https://mega.nz/embed/bCoViAhY#-0Qn7tTHw08HKlMuItztalXKPSbl3VxG9fsYbTrUU3k'
-  },
-    {
-      title: 'Video 3',
-      meta: 'Video',
-      embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
-    },
-    {
     title: 'Secreto de primos',
     meta: 'Video',
     embedUrl: 'https://mega.nz/embed/fDpl0KoB#mE7lgflhkhfiX2pCJr-GdwVVJuCd9USlFcTRckzgFu8'
-    }
+  }
 
 ];
+//---------------------------------------------------------------------------------------
 VIDEOS_BY_CATEGORY.confesiones = [
+  {
+    title: 'Un dolor que no parece ser',
+    meta: 'Video',
+    embedUrl: 'https://mega.nz/embed/HSYxCYZA#yi5JwC3Mf3e67byKHoqdg5widJkA7PqO5pmuOKzcD9g'
+  }
+];
+//---------------------------------------------------------------------------------------
+VIDEOS_BY_CATEGORY.escuela = [
+  {
+    title: 'Un dolor que no parece ser',
+    meta: 'Video',
+    embedUrl: 'https://mega.nz/embed/HSYxCYZA#yi5JwC3Mf3e67byKHoqdg5widJkA7PqO5pmuOKzcD9g'
+  }
+];
+//---------------------------------------------------------------------------------------
+VIDEOS_BY_CATEGORY.misterios = [
+  {
+    title: 'Un dolor que no parece ser',
+    meta: 'Video',
+    embedUrl: 'https://mega.nz/embed/HSYxCYZA#yi5JwC3Mf3e67byKHoqdg5widJkA7PqO5pmuOKzcD9g'
+  }
+];
+//---------------------------------------------------------------------------------------
+VIDEOS_BY_CATEGORY.trabajo = [
+  {
+    title: 'Un dolor que no parece ser',
+    meta: 'Video',
+    embedUrl: 'https://mega.nz/embed/HSYxCYZA#yi5JwC3Mf3e67byKHoqdg5widJkA7PqO5pmuOKzcD9g'
+  }
+];
+//---------------------------------------------------------------------------------------
+VIDEOS_BY_CATEGORY.secretos = [
   {
     title: 'Un dolor que no parece ser',
     meta: 'Video',
