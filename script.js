@@ -72,9 +72,9 @@ VIDEOS_BY_CATEGORY.hot = [
     embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
   },
   {
-    title: 'Video 3',
+    title: 'secreto con mi compañera de trabajo',
     meta: 'Video',
-    embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
+    embedUrl: 'https://mega.nz/file/mDQl2bCA#RpfgfkdPxL8gDP2hycRDT6ZRbge-JCZ191E4c2JkU3s'
   }
 ];
 //---------------------------------------------------------------------------------------
