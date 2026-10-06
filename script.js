@@ -118,9 +118,9 @@ VIDEOS_BY_CATEGORY.misterios = [
 //---------------------------------------------------------------------------------------
 VIDEOS_BY_CATEGORY.trabajo = [
   {
-    title: 'Un dolor que no parece ser',
+    title: 'Secreto con mi compañera de trabajo',
     meta: 'Video',
-    embedUrl: 'https://mega.nz/embed/HSYxCYZA#yi5JwC3Mf3e67byKHoqdg5widJkA7PqO5pmuOKzcD9g'
+    embedUrl: 'https://mega.nz/file/mDQl2bCA#RpfgfkdPxL8gDP2hycRDT6ZRbge-JCZ191E4c2JkU3s'
   }
 ];
 //---------------------------------------------------------------------------------------
