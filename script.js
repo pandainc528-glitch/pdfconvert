@@ -70,6 +70,11 @@ VIDEOS_BY_CATEGORY.hot = [
     title: 'Video 3',
     meta: 'Video',
     embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
+  },
+  {
+    title: 'Video 3',
+    meta: 'Video',
+    embedUrl: 'https://mega.nz/embed/KWQlzIpT#084bFS2VoQq0lGCXtCx7mIK7ZHrmdoG2-e06YV-N5E0'
   }
 ];
 //---------------------------------------------------------------------------------------
